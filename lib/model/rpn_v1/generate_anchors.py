@@ -5,7 +5,8 @@ from __future__ import print_function
 # Licensed under The MIT License [see LICENSE for details]
 # Written by Ross Girshick and Sean Bell
 # --------------------------------------------------------
-# With comments added by Abhimanyu Talwar. 
+# --------------------------------------------------------
+# Comments added by Abhimanyu Talwar. 
 # --------------------------------------------------------
 
 import numpy as np
