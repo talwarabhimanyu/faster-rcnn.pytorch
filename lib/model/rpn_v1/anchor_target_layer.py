@@ -16,7 +16,7 @@ import numpy.random as npr
 
 from model.utils.config import cfg
 from .generate_anchors import GenerateAnchors
-from .bbox_transform import ClipBoxes, bbox_overlaps_batch, bbox_transform_batch
+from .bbox_transform import ClipBoxes, BboxOverlapsBatch, BboxTransformBatch
 
 import pdb
 
@@ -50,6 +50,12 @@ class AnchorTargetLayer(nn.Module):
         The next few lines do something similar to what is done in the ProposalLayer - see my
         detailed comments (with examples) in proposal_layer.py.
 
+        In summary, we have num_anchors variants of the base anchor block (of dimensions 
+        feat_stride x feat_stride) - with each variant being a combination of an anchor scale and
+        anchor ratio. Now, if we translate these num_anchor base variations to each block
+        of dimension feat_stride x feat_stride in the original image, then that whole set of
+        anchors is what we finally store in _anchors below.
+
         """
         feat_h, feat_w = cls_score.shape[3], cls_score.shape[4]
         batch_size = gt_boxes.size(0)
@@ -70,6 +76,7 @@ class AnchorTargetLayer(nn.Module):
 
         total_anchors = int(num_blocks * num_anchors)
 
+        # Get indices of anchors which lie inside the image.
         keep = ((anchors[:, 0] >= -self.allowed_border) &
                 (anchors[:, 1] >= -self.allowed_border) &
                 (anchors[:, 2] < int(im_info[0][1]) + self.allowed_border) &
@@ -86,7 +93,7 @@ class AnchorTargetLayer(nn.Module):
         bbox_inside_weights = gt_boxes.new(batch_size, inds_inside.size(0)).zero_()
         bbox_outside_weights = gt_boxes.new(batch_size, inds_inside.size(0)).zero_()
 
-        overlaps = bbox_overlaps_batch(anchors, gt_boxes)
+        overlaps = BboxOverlapsBatch(anchors, gt_boxes)
 
         max_overlaps, argmax_overlaps = torch.max(overlaps, 2)
         gt_max_overlaps, _ = torch.max(overlaps, 1)
