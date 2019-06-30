@@ -1,4 +1,15 @@
+from __future__ import print_function
+# --------------------------------------------------------
+# Faster R-CNN
+# Copyright (c) 2015 Microsoft
+# Licensed under The MIT License [see LICENSE for details]
+# Written by Ross Girshick and Sean Bell
+# --------------------------------------------------------
+# With comments added by Abhimanyu Talwar. 
+# --------------------------------------------------------
 
+import numpy as np
+import pdb
 
 def GenerateAnchors(base_size, anchor_ratios, anchor_scales):
     """
